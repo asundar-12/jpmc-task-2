@@ -12,9 +12,9 @@ interface IProps {
 
 /**
  * Perspective library adds load to HTMLElement prototype.
- * This interface acts as a wrapper for Typescript compiler.
+ * This i nterface acts as a wrapper for Typescript compiler.
  */
-interface PerspectiveViewerElement {
+interface PerspectiveViewerElement extends HTMLElement {
   load: (table: Table) => void,
 }
 
@@ -32,8 +32,23 @@ class Graph extends Component<IProps, {}> {
 
   componentDidMount() {
     // Get element to attach the table from the DOM.
-    const elem: PerspectiveViewerElement = document.getElementsByTagName('perspective-viewer')[0] as unknown as PerspectiveViewerElement;
+    const elem = document.getElementsByTagName('perspective-viewer')[0] as unknown as PerspectiveViewerElement;
+    //view: graph to visualize data (line graph)
+    elem.setAttribute('view', 'y_line')
+    //column-pivots: switches between the stock values in the dictionary we created
+    elem.setAttribute('column-pivots', '["stock"]')
+    //row-pivots: maps each datapoint based on timestamp
+    elem.setAttribute('row-pivots', '["timestamp"]')
+    //columns: focuses oon a certain attribute of the stock object, in this case the top_ask_price
 
+    //need to do this otherwise it would plot all the datapoints of the stock object, which we dont want.
+    elem.setAttribute('columns', '["top_ask_price"]')
+    //takes the averages of asking prices and consolidates duplicate data if needed
+    elem.setAttribute('aggregates', `
+    {"stock":"distinct_count" ,
+    "top_ask_price":"avg",
+    "top_bid_price":"avg",
+    "timestamp":"distinct count"}`)
     const schema = {
       stock: 'string',
       top_ask_price: 'float',
